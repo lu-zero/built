@@ -318,14 +318,14 @@
 //! pub static INDIRECT_DEPENDENCIES_STR: &str = r"android-tzdata 0.1.1, android_system_properties 0.1.5, autocfg 1.1.0, bitflags 2.4.0, bumpalo 3.13.0, cargo-lock 9.0.0, cc 1.0.83, cfg-if 1.0.0, chrono 0.4.29, core-foundation-sys 0.8.4, equivalent 1.0.1, example_project 0.1.0, fixedbitset 0.4.2, form_urlencoded 1.2.0, git2 0.18.0, hashbrown 0.14.0, iana-time-zone 0.1.57, iana-time-zone-haiku 0.1.2, idna 0.4.0, indexmap 2.0.0, jobserver 0.1.26, js-sys 0.3.64, libc 0.2.147, libgit2-sys 0.16.1+1.7.1, libz-sys 1.1.12, log 0.4.20, memchr 2.6.3, num-traits 0.2.16, once_cell 1.18.0, percent-encoding 2.3.0, petgraph 0.6.4, pkg-config 0.3.27, proc-macro2 1.0.66, quote 1.0.33, semver 1.0.18, serde 1.0.188, serde_derive 1.0.188, serde_spanned 0.6.3, syn 2.0.31, tinyvec 1.6.0, tinyvec_macros 0.1.1, toml 0.7.6, toml_datetime 0.6.3, toml_edit 0.19.14, unicode-bidi 0.3.13, unicode-ident 1.0.11, unicode-normalization 0.1.22, url 2.4.1, vcpkg 0.2.15, wasm-bindgen 0.2.87, wasm-bindgen-backend 0.2.87, wasm-bindgen-macro 0.2.87, wasm-bindgen-macro-support 0.2.87, wasm-bindgen-shared 0.2.87, windows 0.48.0, windows-targets 0.48.5, windows_aarch64_gnullvm 0.48.5, windows_aarch64_msvc 0.48.5, windows_i686_gnu 0.48.5, windows_i686_msvc 0.48.5, windows_x86_64_gnu 0.48.5, windows_x86_64_gnullvm 0.48.5, windows_x86_64_msvc 0.48.5, winnow 0.5.15";
 //! ```
 //!
-//! ### `git2`
+//! ### `gix`
 //! Try to open the git-repository at `manifest_location` and retrieve `HEAD`
 //! tag or commit id.
 //!
 //! Notice that `GIT_HEAD_REF` is `None` if `HEAD` is detached or not valid UTF-8.
 //!
 //! Continuous Integration platforms like `Travis` and `AppVeyor` will
-//! do shallow clones, causing `libgit2` to be unable to get a meaningful
+//! do shallow clones, causing `gix` to be unable to get a meaningful
 //! result. `GIT_VERSION` and `GIT_DIRTY` will therefore always be `None` if
 //! a CI-platform is detected.
 //! ```
@@ -377,7 +377,7 @@
 #[cfg(feature = "cargo-lock")]
 mod dependencies;
 mod environment;
-#[cfg(feature = "git2")]
+#[cfg(feature = "gix")]
 mod git;
 #[cfg(feature = "chrono")]
 mod krono;
@@ -442,7 +442,7 @@ pub(crate) fn fmt_option_str<S: fmt::Display>(o: Option<S>) -> String {
 /// be written to. This should not be a concern if the filename points to
 /// `OUR_DIR`.
 pub fn write_built_file_with_opts(
-    #[cfg(any(feature = "cargo-lock", feature = "git2"))] manifest_location: Option<&path::Path>,
+    #[cfg(any(feature = "cargo-lock", feature = "gix"))] manifest_location: Option<&path::Path>,
     dst: &path::Path,
 ) -> io::Result<()> {
     let mut built_file = fs::File::create(dst)?;
@@ -461,7 +461,7 @@ pub fn write_built_file_with_opts(
     envmap.write_compiler_version(&built_file)?;
     envmap.write_cfg(&built_file)?;
 
-    #[cfg(feature = "git2")]
+    #[cfg(feature = "gix")]
     {
         if let Some(manifest_location) = manifest_location {
             git::write_git_version(manifest_location, &envmap, &built_file)?;
@@ -517,7 +517,7 @@ pub fn write_built_file_with_opts(
 pub fn write_built_file() -> io::Result<()> {
     let dst = path::Path::new(&env::var("OUT_DIR").expect("OUT_DIR not set")).join("built.rs");
     write_built_file_with_opts(
-        #[cfg(any(feature = "cargo-lock", feature = "git2"))]
+        #[cfg(any(feature = "cargo-lock", feature = "gix"))]
         Some(
             env::var("CARGO_MANIFEST_DIR")
                 .expect("CARGO_MANIFEST_DIR")

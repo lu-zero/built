@@ -11,4 +11,4 @@ rust-version = "1.81"
 built = { version = "0.8", path="../", features = ["chrono", "semver"] }
 
 [build-dependencies]
-built = { version = "0.8", path="../", features = ["cargo-lock", "dependency-tree", "git2", "chrono", "semver"] }
+built = { version = "0.8", path="../", features = ["cargo-lock", "dependency-tree", "gix", "chrono", "semver"] }

@@ -3,7 +3,7 @@
 use std::fmt;
 use std::fmt::Write;
 
-#[cfg(feature = "git2")]
+#[cfg(feature = "gix")]
 pub use crate::git::{get_repo_description, get_repo_head};
 
 #[cfg(feature = "chrono")]
