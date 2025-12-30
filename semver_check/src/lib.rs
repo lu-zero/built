@@ -55,7 +55,7 @@ pub const DIRECT_DEPENDENCIES_STR: &str = built_info::DIRECT_DEPENDENCIES_STR;
 pub const INDIRECT_DEPENDENCIES: &[(&str, &str)] = &built_info::INDIRECT_DEPENDENCIES;
 pub const INDIRECT_DEPENDENCIES_STR: &str = built_info::INDIRECT_DEPENDENCIES_STR;
 
-// git2
+// gix
 pub const GIT_VERSION: Option<&str> = built_info::GIT_VERSION;
 pub const GIT_DIRTY: Option<bool> = built_info::GIT_DIRTY;
 pub const GIT_HEAD_REF: Option<&str> = built_info::GIT_HEAD_REF;

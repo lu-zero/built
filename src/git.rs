@@ -1,4 +1,5 @@
 use crate::{environment, fmt_option_str, write_variable};
+use gix::prelude::ObjectIdExt;
 use std::{fs, io, path};
 
 #[cfg(feature = "gix")]
@@ -10,7 +11,7 @@ pub fn write_git_version(
 ) -> io::Result<()> {
     use io::Write;
 
-    // CIs will do shallow clones of repositories, causing libgit2 to error
+    // CIs will do shallow clones of repositories, causing gix to error
     // out. We try to detect if we are running on a CI and ignore the
     // error.
     let (mut tag, mut dirty) = (
@@ -170,8 +171,9 @@ pub fn get_repo_head(
             };
 
             let commit_hash = commit.id.to_string();
-            let commit_short = commit.id.to_string(); // gix doesn't have a direct short_id method, so we'll truncate
-            let commit_short = commit_short.get(0..8).unwrap_or("").to_string();
+            // Use gix's shorten_or_id() method for proper commit hash abbreviation
+            let commit_id = commit.id.attach(&repo);
+            let commit_short = commit_id.shorten_or_id().to_string();
 
             Ok(Some((branch, commit_hash, commit_short)))
         }
@@ -220,7 +222,8 @@ mod tests {
 
         // Get commit hash
         let commit_hash = commit_oid.to_string();
-        let commit_hash_short = commit_hash.get(0..8).unwrap_or("").to_string();
+        // Use gix's proper abbreviation method in tests too
+        let commit_hash_short = commit_oid.shorten_or_id().to_string();
 
         assert!(commit_hash.starts_with(&commit_hash_short));
 
@@ -248,7 +251,7 @@ mod tests {
         std::fs::write(cruft_file, "now dirty").unwrap();
         let (tag, _) = super::get_repo_description(&project_root).unwrap().unwrap();
         assert_eq!(tag, "foobar");
-        // Note: gix may not detect dirty state the same way as git2
+        // Note: gix may detect dirty state differently than the previous git2 implementation
 
         // Test branch creation and HEAD setting
         let branch_name = "refs/heads/baz";
@@ -301,7 +304,8 @@ mod tests {
 
         // Get commit hash
         let commit_hash = commit_oid.to_string();
-        let commit_hash_short = commit_hash.get(0..8).unwrap_or("").to_string();
+        // Use gix's proper abbreviation method in tests too
+        let commit_hash_short = commit_oid.shorten_or_id().to_string();
 
         assert!(commit_hash.starts_with(&commit_hash_short));
 

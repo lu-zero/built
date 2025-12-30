@@ -494,10 +494,10 @@ repository = "https://dev.example.com/sources/testbox/"
 license = "MIT"
 
 [dependencies]
-built = {{ path = "{built_root}", features=["cargo-lock", "dependency-tree", "git2", "chrono", "semver"] }}
+built = {{ path = "{built_root}", features=["cargo-lock", "dependency-tree", "gix", "chrono", "semver"] }}
 
 [build-dependencies]
-built = {{ path = "{built_root}", features=["cargo-lock", "dependency-tree", "git2", "chrono", "semver"] }}
+built = {{ path = "{built_root}", features=["cargo-lock", "dependency-tree", "gix", "chrono", "semver"] }}
 
 [features]
 default = ["SuperAwesome", "MegaAwesome"]
@@ -606,10 +606,10 @@ repository = "https://dev.example.com/sources/testbox/"
 license = "MIT"
 
 [dependencies]
-built = {{ path = "{built_root}", features=["git2", "chrono", "semver"] }}
+built = {{ path = "{built_root}", features=["gix", "chrono", "semver"] }}
 
 [build-dependencies]
-built = {{ path = "{built_root}", features=["git2", "chrono", "semver"] }}
+built = {{ path = "{built_root}", features=["gix", "chrono", "semver"] }}
 
 [features]
 default = ["SuperAwesome", "MegaAwesome"]
@@ -786,10 +786,10 @@ repository = "https://dev.example.com/sources/great-testbox/"
 license = "MIT"
 
 [dependencies]
-built = {{ path = "{built_root}", features=["git2", "chrono", "semver"] }}
+built = {{ path = "{built_root}", features=["gix", "chrono", "semver"] }}
 
 [build-dependencies]
-built = {{ path = "{built_root}", features=["git2", "chrono", "semver"] }}
+built = {{ path = "{built_root}", features=["gix", "chrono", "semver"] }}
 
 [features]
 default = ["SuperAwesome", "MegaAwesome"]

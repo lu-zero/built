@@ -25,4 +25,4 @@ rustversion = "1.0"
 dependency-tree = [ "cargo-lock/dependency-tree" ]
 
 [package.metadata.docs.rs]
-features = [ "cargo-lock", "chrono", "dependency-tree", "git2", "semver" ]
+features = [ "cargo-lock", "chrono", "dependency-tree", "gix", "semver" ]
