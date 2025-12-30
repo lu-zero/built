@@ -53,6 +53,7 @@ impl Project {
 name = "testbox"
 version = "0.0.1"
 build = "build.rs"
+edition = "2024"
 
 [build-dependencies]
 built = {{ path = "{}", features = {} }}"#,
@@ -1036,20 +1037,32 @@ fn main() {
 }
 "#,
     );
-    let repo = p.init_git();
-    let root = p.create().expect("Creating the project failed");
+    let root = {
+        let _repo = p.init_git();
+        p.create().expect("Creating the project failed")
+    };
 
-    // Create an empty tree and commit using repository's default signature
-    let empty_tree = repo.empty_tree();
-    let empty_tree_id = empty_tree.id();
+    // Add the source files to git and create a commit using git commands
+    std::process::Command::new("git")
+        .args(["add", "src/main.rs"])
+        .current_dir(root.path())
+        .status()
+        .expect("Failed to add files to git");
 
-    repo.commit(
-        "HEAD",
-        "Testing testing 1 2 3",
-        empty_tree_id,
-        Vec::<gix::ObjectId>::new(),
-    )
-    .expect("Failed to commit");
+    std::process::Command::new("git")
+        .args([
+            "-c",
+            "user.email=test@test.com",
+            "-c",
+            "user.name=Test User",
+            "commit",
+            "-m",
+            "Testing testing 1 2 3",
+        ])
+        .current_dir(root.path())
+        .status()
+        .expect("Failed to commit");
+
     Project::run(
         root.as_ref(),
         &[],
@@ -1068,8 +1081,7 @@ mod built_info {
 }
 
 fn main() {
-    // Note: gix may not detect dirty state the same way as git2
-    // assert_eq!(built_info::GIT_DIRTY, Some(true));
+    assert_eq!(built_info::GIT_DIRTY, Some(true));
     assert!(built_info::GIT_COMMIT_HASH.is_some());
     assert!(built_info::GIT_COMMIT_HASH_SHORT.is_some());
     assert!(built_info::GIT_COMMIT_HASH.unwrap().starts_with(built_info::GIT_COMMIT_HASH_SHORT.unwrap()));
