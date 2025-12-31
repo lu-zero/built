@@ -1045,15 +1045,18 @@ fn main() {
     // Add file and create commit using gix API
     let repo = gix::open(root.path()).unwrap();
     let file_path = root.path().join("src/main.rs");
-    let blob_id = repo.write_blob(&std::fs::read(&file_path).unwrap()).unwrap();
+    let blob_id = repo
+        .write_blob(&std::fs::read(&file_path).unwrap())
+        .unwrap();
 
     // Write index with the file
     let index_path = repo.git_dir().join("index");
     let mut index = gix::index::State::new(repo.object_hash());
     index.dangerously_push_entry(
         gix::index::entry::Stat::from_fs(
-            &gix::index::fs::Metadata::from_path_no_follow(&file_path).unwrap()
-        ).unwrap(),
+            &gix::index::fs::Metadata::from_path_no_follow(&file_path).unwrap(),
+        )
+        .unwrap(),
         blob_id.detach(),
         gix::index::entry::Flags::from_stage(gix::index::entry::Stage::Unconflicted),
         gix::index::entry::Mode::FILE,
@@ -1064,24 +1067,33 @@ fn main() {
         .unwrap();
 
     // Create tree hierarchy: src dir containing main.rs
-    let src_tree_id = repo.write_object(&gix::objs::Tree {
-        entries: vec![gix::objs::tree::Entry {
-            mode: gix::objs::tree::EntryMode::try_from(0o100644).unwrap(),
-            filename: "main.rs".into(),
-            oid: blob_id.detach(),
-        }],
-    }).unwrap();
-
-    let root_tree_id = repo.write_object(&gix::objs::Tree {
-        entries: vec![gix::objs::tree::Entry {
-            mode: gix::objs::tree::EntryMode::try_from(0o040000).unwrap(),
-            filename: "src".into(),
-            oid: src_tree_id.detach(),
-        }],
-    }).unwrap();
-
-    repo.commit("HEAD", "Testing testing 1 2 3", root_tree_id, Vec::<gix::ObjectId>::new())
+    let src_tree_id = repo
+        .write_object(&gix::objs::Tree {
+            entries: vec![gix::objs::tree::Entry {
+                mode: gix::objs::tree::EntryMode::try_from(0o100644).unwrap(),
+                filename: "main.rs".into(),
+                oid: blob_id.detach(),
+            }],
+        })
         .unwrap();
+
+    let root_tree_id = repo
+        .write_object(&gix::objs::Tree {
+            entries: vec![gix::objs::tree::Entry {
+                mode: gix::objs::tree::EntryMode::try_from(0o040000).unwrap(),
+                filename: "src".into(),
+                oid: src_tree_id.detach(),
+            }],
+        })
+        .unwrap();
+
+    repo.commit(
+        "HEAD",
+        "Testing testing 1 2 3",
+        root_tree_id,
+        Vec::<gix::ObjectId>::new(),
+    )
+    .unwrap();
 
     Project::run(
         root.as_ref(),
